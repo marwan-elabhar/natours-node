@@ -12,6 +12,16 @@ const signToken = id => {
 
 const createSendToken = (user, statusCode, res) => {
   const token = signToken(user._id);
+  // convert days to ms
+  const expires = new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000);
+  const cookieOptions = {
+    expires,
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+  }
+  res.cookie('jwt', token, cookieOptions);
+
+  user.password = undefined;
 
   res.status(statusCode).json({
     status: 'success',
@@ -94,13 +104,11 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     return next(new AppError('No user with email address'), 404);
   }
 
-  console.log('1')
 
   // 2. Generate random token
   const resetToken = user.createPasswordResetToken()
   await user.save({validateBeforeSave: false})
 
-  console.log('2')
 
   // 3. Send token in email
   const resetURL = `${req.protocol}://${req.get('host')}/api/v1/users/resetPassword/${resetToken}}`;
@@ -110,7 +118,6 @@ try {
   await sendEmail({email: user.email,
     subject: 'Password reset token (valid for 10 mins)',
     message})
-  console.log('3')
 
   res.status(200).json({
     status: 'success',
