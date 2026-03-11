@@ -49,14 +49,14 @@ exports.login = catchAsync(async (req, res, next) => {
 
   // 1) Check if email and password exist
   if (!email || !password) {
-    next(new AppError('Please enter email or password'), 400);
+  return  next(new AppError('Please enter email or password', 400));
   }
 
   // 2) Check if user exists & password is correct
   const user = await User.findOne({ email }).select('+password');
 
   if (!user || !(await user.correctPassword(password, user.password))) {
-    return next(new AppError('Incorrect email or password'), 401);
+    return next(new AppError('Incorrect email or password', 401));
   }
   createSendToken(user, 200, res);
 
@@ -94,6 +94,7 @@ exports.restrictTo = (...roles) => {
     if (!roles.includes(req.user.role)) {
       return next(new AppError('ma3ksh permission'), 403);
     }
+    next()
   };
 };
 
