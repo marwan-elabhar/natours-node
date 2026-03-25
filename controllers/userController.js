@@ -44,6 +44,10 @@ exports.addUser = (req, res) => {
 exports.updateUser = factory.updateOne(User)
 exports.getAllUsers = factory.getAll(User)
 exports.deleteUser = factory.deleteOne(User)
+exports.getMe = (req, res, next) => {
+  req.params.id = req.user.id
+  next()
+}
 
 exports.deleteMe = catchAsync(async (req, res) => {
   await User.findByIdAndUpdate(req.user.id, { active: false})
