@@ -45,12 +45,7 @@ exports.updateMe = catchAsync(async(req, res, next) => {
   // update user
 })
 
-exports.getUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: "Internal Server Error"
-  })
-}
+exports.getUser = factory.getOne(User);
 
 exports.addUser = (req, res) => {
   res.status(500).json({
