@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
@@ -15,6 +16,11 @@ const reviewRouter = require('./routes/reviewRoutes');
 
 const app = express();
 /// set security https headers
+
+app.set('view engine', 'pug')
+// app.set('views', express.static(path.join(__dirname, 'views')));
+app.use(express.static(`${__dirname}/public`));
+
 // app.use(helmet());
 
 
@@ -46,7 +52,6 @@ app.use(express.json({limit: '10mb'}));
 //   whitelist: ['duration']
 // }))
 
-app.use(express.static(`${__dirname}/public`));
 
 app.use((req, res, next) => {
   console.log("middleware")
@@ -59,6 +64,12 @@ app.use((req,res,next) => {
 })
 
 // ROUTES
+app.get('/', (req, res) => {
+  res.status(200).render('base', {
+    tour: 'The Forest Hiker',
+    user: 'Marwan'
+  })
+})
 
 app.use('/api/v1/tours', tourRouter)
 app.use('/api/v1/users', userRouter)
